@@ -1,26 +1,23 @@
-import { createBrowserRouter, RouterProvider } from 'react-router'
-import Home from './pages/Home'
-import SignIn from './pages/SignIn'
-import MovieDetails from './pages/MovieDetails'
-import { requiresAuth } from './loaders/requiresAuth'
+import { createBrowserRouter, RouterProvider } from "react-router";
+import { requiresAuth } from "./loaders/requiresAuth";
+import { dynamic } from "@/lib/dynamic";
 
 const router = createBrowserRouter([
-    {
-        path: '/',
-        // element: <Home />,
-        Component: Home
-    },
-    {
-        path: '/movies/:movieId', // 동적 세그먼트
-        Component: MovieDetails,
-        loader: requiresAuth
-    },
-    {
-        path: '/signin',
-        Component: SignIn
-    }
-])
+  {
+    path: "/",
+    Component: dynamic(() => import("./pages/Home")),
+  },
+  {
+    path: "/movies/:movieId", // 동적 세그먼트
+    Component: dynamic(() => import("./pages/MovieDetails")),
+    loader: requiresAuth,
+  },
+  {
+    path: "/signin",
+    Component: dynamic(() => import("./pages/SignIn")),
+  },
+]);
 
 export default function Router() {
-    return <RouterProvider router={router} />
+  return <RouterProvider router={router} />;
 }
