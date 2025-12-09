@@ -1,5 +1,9 @@
 import { useState } from 'react'
-import { useQuery, useQueryClient, queryOptions } from '@tanstack/react-query'
+import {
+  useInfiniteQuery,
+  useQueryClient,
+  infiniteQueryOptions
+} from '@tanstack/react-query'
 import axios from 'axios'
 import Loader from '@/components/Loader'
 
@@ -22,37 +26,43 @@ export default function Movies() {
   const [searchText, setSearchText] = useState('')
   const queryClient = useQueryClient()
 
-  const options = queryOptions<SimpleMovie[]>({
+  const options = infiniteQueryOptions<ResponseValue>({
     queryKey: ['movies', searchText],
-    queryFn: async () => {
-      const { data } = await axios.get(
-        `https://omdbapi.com?apikey=7035c60c&s=${searchText}`
+    queryFn: async ({ pageParam }) => {
+      const { data: page } = await axios.get(
+        `https://omdbapi.com?apikey=7035c60c&s=${searchText}&page=${pageParam}`
       )
-      return data.Search
+      return page
     },
     staleTime: 1000 * 60 * 60 * 24, // 24 hours
     enabled: Boolean(searchText),
-    select: movies => {
-      return movies.filter((movie, index, self) => {
-        return self.findIndex(m => m.imdbID === movie.imdbID) === index
-      })
-    },
-    placeholderData: prev => {
-      // 기존 데이터 유지하도록 처리 (재검색시 깜빡임 방지)
-      return prev
+    // select: data => {
+    //   return data.Search.filter((movie, index, self) => {
+    //     return self.findIndex(m => m.imdbID === movie.imdbID) === index
+    //   })
+    // },
+    placeholderData: prev => prev, // 기존 데이터 유지하도록 처리 (재검색시 깜빡임 방지)
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      const maxPage = Math.ceil(Number(lastPage.totalResults) / 10) // 검색 결과 => '632' => 632 => 64
+      return allPages.length < maxPage ? allPages.length + 1 : null
     }
   })
 
-  const { data: movies, isFetching, refetch } = useQuery(options)
+  const { data, isFetching, fetchNextPage } = useInfiniteQuery(options)
 
   function searchMovies() {
     setSearchText(inputText)
   }
 
-  function fetchQuery() {
-    // 캐시된 데이터가 있으면 해당 데이터 사용하고, 없으면 새로 요청
-    queryClient.fetchQuery(options)
-  }
+  //   function fetchQuery() {
+  //     // 캐시된 데이터가 있으면 해당 데이터 사용하고, 없으면 새로 요청
+  //     queryClient.fetchQuery(options)
+  //     queryClient.getQueryData(options.queryKey)
+  //     queryClient.setQueryData(options.queryKey, [])
+  //     queryClient.removeQueries({ queryKey: options.queryKey })
+  //     queryClient.invalidateQueries({ queryKey: options.queryKey })
+  //   }
 
   return (
     <>
@@ -68,8 +78,8 @@ export default function Movies() {
         }}
       />
       <button onClick={searchMovies}>검색!</button>
-      <button onClick={() => refetch()}>다시 검색!</button>
-      <button onClick={fetchQuery}>캐시 검색!</button>
+      {/* <button onClick={() => refetch()}>다시 검색!</button>
+      <button onClick={fetchQuery}>캐시 검색!</button> */}
 
       {isFetching && (
         <Loader
@@ -78,10 +88,13 @@ export default function Movies() {
         />
       )}
       <ul>
-        {movies?.map(movie => {
-          return <li key={movie.imdbID}>{movie.Title}</li>
+        {data?.pages.map(page => {
+          return page.Search.map(movie => {
+            return <li key={movie.imdbID}>{movie.Title}</li>
+          })
         })}
       </ul>
+      <button onClick={() => fetchNextPage()}>다음 페이지</button>
     </>
   )
 }
