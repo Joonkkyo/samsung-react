@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import {
   useInfiniteQuery,
   useQueryClient,
   infiniteQueryOptions
 } from '@tanstack/react-query'
+import { useInView } from 'react-intersection-observer'
 import axios from 'axios'
 import Loader from '@/components/Loader'
 
@@ -22,6 +23,9 @@ export interface SimpleMovie {
 }
 
 export default function Movies() {
+  const { ref, inView } = useInView({
+    rootMargin: '0px 0px 500px 0px' // 인식 범위 조정
+  })
   const [inputText, setInputText] = useState('')
   const [searchText, setSearchText] = useState('')
   const queryClient = useQueryClient()
@@ -49,20 +53,18 @@ export default function Movies() {
     }
   })
 
-  const { data, isFetching, fetchNextPage } = useInfiniteQuery(options)
+  const { data, isFetching, fetchNextPage, hasNextPage } =
+    useInfiniteQuery(options)
 
   function searchMovies() {
     setSearchText(inputText)
   }
 
-  //   function fetchQuery() {
-  //     // 캐시된 데이터가 있으면 해당 데이터 사용하고, 없으면 새로 요청
-  //     queryClient.fetchQuery(options)
-  //     queryClient.getQueryData(options.queryKey)
-  //     queryClient.setQueryData(options.queryKey, [])
-  //     queryClient.removeQueries({ queryKey: options.queryKey })
-  //     queryClient.invalidateQueries({ queryKey: options.queryKey })
-  //   }
+  useEffect(() => {
+    if (inView) {
+      fetchNextPage()
+    }
+  }, [inView])
 
   return (
     <>
@@ -78,8 +80,6 @@ export default function Movies() {
         }}
       />
       <button onClick={searchMovies}>검색!</button>
-      {/* <button onClick={() => refetch()}>다시 검색!</button>
-      <button onClick={fetchQuery}>캐시 검색!</button> */}
 
       {isFetching && (
         <Loader
@@ -88,13 +88,24 @@ export default function Movies() {
         />
       )}
       <ul>
-        {data?.pages.map(page => {
-          return page.Search.map(movie => {
-            return <li key={movie.imdbID}>{movie.Title}</li>
-          })
+        {data?.pages.map((page, index) => {
+          return (
+            <Fragment key={index}>
+              <li>----------- {index + 1} -----------</li>
+              {page.Search?.map(movie => {
+                return <li key={movie.imdbID}>{movie.Title}</li>
+              })}
+            </Fragment>
+          )
         })}
       </ul>
-      <button onClick={() => fetchNextPage()}>다음 페이지</button>
+      <button // 참조를 걸어놓은 요소는 조건부 렌더링하면 안됨
+        ref={ref}
+        style={{
+          display: isFetching || !searchText || !hasNextPage ? 'none' : 'block'
+        }}>
+        다음 페이지
+      </button>
     </>
   )
 }
