@@ -1,6 +1,5 @@
 import { Link } from 'react-router'
 import { useCountStore } from '@/stores/count'
-import { useShallow } from 'zustand/shallow'
 
 export default function Home() {
   const count = useCountStore(s => s.count)
@@ -10,11 +9,12 @@ export default function Home() {
     <>
       <h1>Home Page!</h1>
       <h2 onClick={increase}>Count: {count}</h2>
-      <Link to="/signin">Sign In</Link>
-      <br />
-      <Link to="/movies/tt0848228">Avengers</Link>
-      <br />
-      <Link to="/movies/tt1877830">Batman</Link>
+      <div className="flex flex-col gap-2">
+        <Link to="/signin">Sign In</Link>
+        <Link to="/movies">Movies</Link>
+        <Link to="/movies/tt0848228">Avengers</Link>
+        <Link to="/movies/tt1877830">Batman</Link>
+      </div>
     </>
   )
 }
