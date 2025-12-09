@@ -8,8 +8,12 @@ const router = createBrowserRouter([
     Component: dynamic(() => import('./pages/Home'))
   },
   {
+    path: '/todos',
+    Component: dynamic(() => import('./pages/Todos'))
+  },
+  {
     path: '/movies',
-    Component: dynamic(() => import('./pages/Movies'))
+    Component: dynamic(() => import('./pages/Movies.infiniteQuery'))
   },
   {
     path: '/movies/:movieId', // 동적 세그먼트
