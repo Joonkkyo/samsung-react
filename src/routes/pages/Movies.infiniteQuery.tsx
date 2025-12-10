@@ -1,9 +1,5 @@
 import { useState, useEffect, Fragment } from 'react'
-import {
-  useInfiniteQuery,
-  useQueryClient,
-  infiniteQueryOptions
-} from '@tanstack/react-query'
+import { useInfiniteQuery, infiniteQueryOptions } from '@tanstack/react-query'
 import { useInView } from 'react-intersection-observer'
 import axios from 'axios'
 import Loader from '@/components/Loader'
@@ -28,7 +24,6 @@ export default function Movies() {
   })
   const [inputText, setInputText] = useState('')
   const [searchText, setSearchText] = useState('')
-  const queryClient = useQueryClient()
 
   const options = infiniteQueryOptions<ResponseValue>({
     queryKey: ['movies', searchText],
