@@ -1,5 +1,5 @@
 'use client'
-import { signIn, signOut } from '@/app/serverActions/auth'
+import { signIn, signOut } from '@/serverActions/auth'
 
 export default function Page() {
   return (

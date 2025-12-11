@@ -20,7 +20,7 @@ export const api = axios.create({
 })
 
 export async function fetchTodos() {
-  console.log('fetchTodos in server action!')
-  const { data: todos } = await api.get('/')
+  'use cache'
+  const { data: todos } = await api.get<Todo[]>('/')
   return todos
 }

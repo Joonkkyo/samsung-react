@@ -5,6 +5,7 @@ import MovieTitle from './MovieTitle'
 export interface Movie {
   Title: string
   Poster: string
+  Plot: string
 }
 
 export default async function Page({

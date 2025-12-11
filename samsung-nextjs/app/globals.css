@@ -1,1 +1,6 @@
 @import 'tailwindcss';
+
+div {
+  width: auto;
+  height: auto;
+}
