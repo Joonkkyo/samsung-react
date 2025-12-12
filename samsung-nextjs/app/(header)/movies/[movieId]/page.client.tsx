@@ -7,6 +7,7 @@ import { use, useEffect, useState } from 'react'
 export interface Movie {
   Title: string
   Poster: string
+  Plot: string
 }
 
 export default function Page({

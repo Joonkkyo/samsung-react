@@ -1,7 +1,3 @@
-export default function Home() {
-  return (
-    <>
-      <h1>Movie Page!</h1>
-    </>
-  )
+export default function Page() {
+  return <h1>Movies Page!</h1>
 }
