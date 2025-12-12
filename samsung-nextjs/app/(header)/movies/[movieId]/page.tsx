@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import axios from 'axios'
 import MovieTitle from './MovieTitle'
 import { fetchMovieDetails } from '@/serverActions/movie'
 

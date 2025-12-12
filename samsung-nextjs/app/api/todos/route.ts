@@ -20,7 +20,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const { title } = (await request.json()) || {}
   const { data: todo } = await api.post('/', {
-    title: ''
+    title
   })
   return Response.json(todo)
 }

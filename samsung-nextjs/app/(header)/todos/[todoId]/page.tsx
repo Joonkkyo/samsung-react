@@ -1,4 +1,5 @@
 import { fetchTodos } from '@/serverActions/todo'
+import Modal from './Modal'
 
 export default async function Page({
   params
@@ -8,5 +9,5 @@ export default async function Page({
   const { todoId } = await params
   const todos = await fetchTodos()
   const todo = todos.find(t => t.id === todoId)
-  return <></>
+  return <>{todo ? <Modal todo={todo} /> : '잘못된 접근입니다!'}</>
 }
